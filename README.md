@@ -1,6 +1,6 @@
 # Vert.x Eclipse Sisu Extension
 
-Adds (Eclipse Sisu)[https://www.eclipse.org/sisu/] enabled DI to Vert.x.
+Adds [Eclipse Sisu](https://www.eclipse.org/sisu/) enabled DI to Vert.x.
 
 ## "Local" mode
 
