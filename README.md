@@ -45,3 +45,7 @@ sisu-remote:org.cstamas.vertx:vertx-sisu-local:jar:tests:1.0.0-SNAPSHOT::Example
 sisu-remote:org.cstamas.vertx:vertx-sisu-local:jar:tests:1.0.0-SNAPSHOT::*NamedVerticle // matches ExampleNamedVerticle only
 sisu-remote:org.cstamas.vertx:vertx-sisu-local:jar:tests:1.0.0-SNAPSHOT::ExampleNamedVerticle // matches ExampleNamedVerticle only
 ```
+
+Improvements compared to vertx-maven-service-factory:
+* uses Takari concurrent local repository (multiple processes may share same local repository)
+* uses OkHttp HTTP/2 enabled transport
