@@ -20,9 +20,11 @@
 
     <vertx.version>3.1.0</vertx.version>
     <aether.version>1.0.2.v20150114</aether.version>
+    <sisu.version>0.3.2</sisu.version>
   </properties>
 
   <modules>
+    <module>example</module>
     <module>local</module>
     <module>remote</module>
   </modules>
@@ -44,7 +46,7 @@
       <dependency>
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>org.eclipse.sisu.inject</artifactId>
-        <version>0.3.2</version>
+        <version>${sisu.version}</version>
       </dependency>
 
       <dependency>
@@ -58,11 +60,13 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>org.eclipse.aether</groupId>
         <artifactId>aether-api</artifactId>
         <version>${aether.version}</version>
       </dependency>
+
       <dependency>
         <groupId>org.eclipse.aether</groupId>
         <artifactId>aether-connector-basic</artifactId>
@@ -103,6 +107,13 @@
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <version>4.12</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>1.7.12</version>
         <scope>test</scope>
       </dependency>
 

@@ -1,0 +1,55 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.cstamas.vertx</groupId>
+    <artifactId>vertx-sisu</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>vertx-sisu-example</artifactId>
+  <packaging>takari-jar</packaging>
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>Example module that holds some verticles and components</description>
+
+  <dependencies>
+    <!-- We depends on vert.x to implement some Verticles -->
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-core</artifactId>
+    </dependency>
+
+    <!-- We use javax.inject annotations to annotate them for DI -->
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+      <version>1</version>
+    </dependency>
+
+    <!-- In real life you'd have more dependencies here, like for testing -->
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <!-- The module must provide sisu index, you can achieve it by:
+        a) using this plugin as below, or
+        b) having org.eclipse.sisu:org.eclipse.sisu.inject on compile classpath
+        -->
+        <groupId>org.eclipse.sisu</groupId>
+        <artifactId>sisu-maven-plugin</artifactId>
+        <version>${sisu.version}</version>
+        <executions>
+          <execution>
+            <id>index-project</id>
+            <goals>
+              <goal>main-index</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

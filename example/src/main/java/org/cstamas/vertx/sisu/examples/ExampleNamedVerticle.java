@@ -14,7 +14,7 @@ public class ExampleNamedVerticle
 {
   private static final Logger log = LoggerFactory.getLogger(ExampleNamedVerticle.class);
 
-  public static final String NAME = "example";
+  public static final String NAME = "ExampleNamedVerticle";
 
   public static final String ADDR = "example2";
 

@@ -6,8 +6,6 @@ import javax.inject.Singleton;
 
 import io.vertx.core.Vertx;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 @Named
 @Singleton
 public class MyComponent
@@ -17,7 +15,7 @@ public class MyComponent
   @Inject
   public MyComponent(final Vertx vertx)
   {
-    this.vertx = checkNotNull(vertx); // to verify it is injected
+    this.vertx = vertx;
   }
 
   public String getReply() {

@@ -1,1 +1,2 @@
+org.cstamas.vertx.sisu.SisuVerticleFactory
 org.cstamas.vertx.sisu.SisuLocalVerticleFactory
