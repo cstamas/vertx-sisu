@@ -67,7 +67,7 @@ Heavily inspired by Vert.x `vertx-maven-service-factory`. Provides following pre
 The `sisu-remote` prefix currently uses following syntax:
 
 ```
-sisu-local:artifactCoordinate[::filter]
+sisu-remote:artifactCoordinate[::filter]
 ```
 Where `artifactCoordinate` is the usual Maven artifact "one liner":
 
