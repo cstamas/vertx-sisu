@@ -3,6 +3,7 @@ package org.cstamas.vertx.sisu;
 import java.util.Map;
 
 import com.google.inject.Injector;
+import com.google.inject.Module;
 
 /**
  * {@link Injector} factory.
@@ -11,5 +12,5 @@ import com.google.inject.Injector;
  */
 public interface InjectorFactory
 {
-  Injector injectorFor(final ClassLoader classLoader, final Map<String, String> parameters);
+  Injector injectorFor(final ClassLoader classLoader, final Map<String, String> parameters, final Module... modules);
 }

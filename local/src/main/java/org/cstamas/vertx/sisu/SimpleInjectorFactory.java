@@ -5,6 +5,7 @@ import java.util.Map;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Module;
 import com.google.inject.Stage;
 import io.vertx.core.Vertx;
 import org.eclipse.sisu.space.BeanScanning;
@@ -28,11 +29,14 @@ public class SimpleInjectorFactory
   }
 
   @Override
-  public Injector injectorFor(final ClassLoader classLoader, final Map<String, String> parameters) {
+  public Injector injectorFor(final ClassLoader classLoader,
+                              final Map<String, String> parameters,
+                              final Module... modules)
+  {
     return Guice.createInjector(
         Stage.DEVELOPMENT,
         new WireModule(
-            new AbstractModule()
+            new AbstractModule() // params
             {
               @Override
               protected void configure() {
@@ -42,7 +46,16 @@ public class SimpleInjectorFactory
                 }
               }
             },
-            new SpaceModule(
+            new AbstractModule() // extra modules
+            {
+              @Override
+              protected void configure() {
+                for (Module module : modules) {
+                  install(module);
+                }
+              }
+            },
+            new SpaceModule( // space module
                 new URLClassSpace(classLoader), BeanScanning.INDEX
             )
         )
