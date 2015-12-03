@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -19,8 +20,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Bootstrap {@link Verticle} that gets {@link Map} of {@link Verticle}s injected by Sisu, and it simply relays the
@@ -39,7 +39,7 @@ public class BootstrapVerticle
   private Map<String, Verticle> verticles;
 
   public BootstrapVerticle(final Predicate<String> filter) {
-    this.filter = checkNotNull(filter);
+    this.filter = requireNonNull(filter);
   }
 
   @Inject
@@ -47,7 +47,10 @@ public class BootstrapVerticle
     verticles = verticleMap.entrySet().stream()
         .filter(e -> filter.test(e.getKey()))
         .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-    checkArgument(!verticles.isEmpty(), "No Verticle participating in bootstrap!");
+    if (verticles.isEmpty()) {
+      throw new IllegalArgumentException(
+          "No verticle participates in bootstrap? (are they discoverable, or filter filtered out all of them?)");
+    }
     log.debug("Bootstrapping following verticles: " + verticles);
   }
 
@@ -79,6 +82,7 @@ public class BootstrapVerticle
     }
   }
 
+  @Nonnull
   private Handler<AsyncResult<Void>> delegatingHandler(final AtomicInteger counter,
                                                        final Future<Void> lifecycleFuture)
   {

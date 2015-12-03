@@ -1,10 +1,8 @@
 package org.cstamas.vertx.sisu;
 
 import java.lang.annotation.Annotation;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 
-import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import io.vertx.core.Verticle;
@@ -14,12 +12,12 @@ import io.vertx.core.spi.VerticleFactory;
 import org.eclipse.sisu.BeanEntry;
 import org.eclipse.sisu.inject.BeanLocator;
 
+import static org.cstamas.vertx.sisu.Utilities.shareInstance;
+
 /**
  * A {@link VerticleFactory} that uses given class loader to create Sisu container and lookup {@link Verticle}
  * by FQ class name or name. Prefix is {@code sisu}. The {@link Verticle} should be annotated with {@link @Named} and
  * discoverable by Sisu.
- *
- * @since 1.0
  */
 public class SisuVerticleFactory
     implements VerticleFactory
@@ -28,8 +26,6 @@ public class SisuVerticleFactory
 
   private InjectorFactory injectorFactory;
 
-  private IdentityHashMap<ClassLoader, Injector> injectorCache;
-
   @Override
   public String prefix() {
     return PREFIX;
@@ -37,17 +33,14 @@ public class SisuVerticleFactory
 
   @Override
   public void init(final Vertx vertx) {
-    this.injectorFactory = new SimpleInjectorFactory(vertx);
-    this.injectorCache = new IdentityHashMap<>();
+    this.injectorFactory = shareInstance(
+        vertx,
+        InjectorFactory.class.getName(), new CachingInjectorFactory(new SimpleInjectorFactory(vertx))
+    );
   }
 
   @Override
   public Verticle createVerticle(final String identifier, final ClassLoader classLoader) throws Exception {
-    if (!injectorCache.containsKey(classLoader)) {
-      injectorCache.put(classLoader, injectorFactory.injectorFor(classLoader, null));
-    }
-    final BeanLocator beanLocator = injectorCache.get(classLoader).getInstance(BeanLocator.class);
-
     String verticleName = VerticleFactory.removePrefix(identifier);
     Class clazz;
     if (verticleName.endsWith(".java")) {
@@ -59,6 +52,7 @@ public class SisuVerticleFactory
       clazz = tryToLoadClass(classLoader, verticleName);
     }
 
+    final BeanLocator beanLocator = injectorFactory.injectorFor(classLoader).getInstance(BeanLocator.class);
     if (clazz != null) { // try by class
       return lookup(beanLocator, Key.get(clazz));
     }

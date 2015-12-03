@@ -1,6 +1,9 @@
 package org.cstamas.vertx.sisu;
 
+import java.util.List;
 import java.util.Map;
+
+import javax.annotation.Nullable;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -14,24 +17,37 @@ import org.eclipse.sisu.space.URLClassSpace;
 import org.eclipse.sisu.wire.ParameterKeys;
 import org.eclipse.sisu.wire.WireModule;
 
+import static java.util.Objects.requireNonNull;
+
 /**
- * {@link Injector} factory that set up default bindings.
- *
- * @since 1.0
+ * {@link Injector} factory that set up default bindings and creates injector.
  */
 public class SimpleInjectorFactory
     implements InjectorFactory
 {
   private final Vertx vertx;
 
+  @Nullable
+  private final Map<String, String> parameters;
+
+  @Nullable
+  private final List<Module> modules;
+
   public SimpleInjectorFactory(final Vertx vertx) {
-    this.vertx = vertx;
+    this(vertx, null, null);
+  }
+
+  public SimpleInjectorFactory(final Vertx vertx,
+                               @Nullable final Map<String, String> parameters,
+                               @Nullable final List<Module> modules)
+  {
+    this.vertx = requireNonNull(vertx);
+    this.parameters = parameters;
+    this.modules = modules;
   }
 
   @Override
-  public Injector injectorFor(final ClassLoader classLoader,
-                              final Map<String, String> parameters,
-                              final Module... modules)
+  public Injector injectorFor(final ClassLoader classLoader)
   {
     return Guice.createInjector(
         Stage.DEVELOPMENT,
@@ -44,14 +60,10 @@ public class SimpleInjectorFactory
                 if (parameters != null) {
                   bind(ParameterKeys.PROPERTIES).toInstance(parameters);
                 }
-              }
-            },
-            new AbstractModule() // extra modules
-            {
-              @Override
-              protected void configure() {
-                for (Module module : modules) {
-                  install(module);
+                if (modules != null) {
+                  for (Module module : modules) {
+                    install(module);
+                  }
                 }
               }
             },

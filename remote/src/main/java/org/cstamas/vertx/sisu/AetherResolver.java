@@ -8,6 +8,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
+
 import io.takari.aether.connector.AetherRepositoryConnectorFactory;
 import io.takari.aether.localrepo.TakariLocalRepositoryManagerFactory;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
@@ -31,6 +33,9 @@ import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.filter.DependencyFilterUtils;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
 
+/**
+ * Aether backed {@link Resolver}.
+ */
 public class AetherResolver
     implements Resolver
 {
@@ -108,6 +113,7 @@ public class AetherResolver
     }
   }
 
+  @Nonnull
   @Override
   public List<File> resolve(final String coordinates) {
     DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();

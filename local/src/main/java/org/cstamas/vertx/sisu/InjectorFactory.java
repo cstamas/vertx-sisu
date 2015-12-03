@@ -1,16 +1,17 @@
 package org.cstamas.vertx.sisu;
 
-import java.util.Map;
+import javax.annotation.Nonnull;
 
 import com.google.inject.Injector;
-import com.google.inject.Module;
 
 /**
  * {@link Injector} factory.
- *
- * @since 1.0
  */
 public interface InjectorFactory
 {
-  Injector injectorFor(final ClassLoader classLoader, final Map<String, String> parameters, final Module... modules);
+  /**
+   * Creates sisu enabled {@link Injector}. Implementation may cache injectors.
+   */
+  @Nonnull
+  Injector injectorFor(final ClassLoader classLoader);
 }

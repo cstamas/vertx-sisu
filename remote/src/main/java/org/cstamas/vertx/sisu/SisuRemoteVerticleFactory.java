@@ -4,7 +4,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,8 +17,6 @@ import io.vertx.core.spi.VerticleFactory;
  * A {@link VerticleFactory} that uses given coordinate to download remote artifact (with dependencies), and then
  * delegate verticle creation to {@link SisuLocalVerticleFactory} to lookup all {@link Verticle}s from it. Prefix is
  * {@code sisu-remote}.
- *
- * @since 1.0
  */
 public class SisuRemoteVerticleFactory
     implements VerticleFactory
