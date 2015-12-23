@@ -26,12 +26,17 @@ public class ExampleVerticle
 
   @Override
   public void start() throws Exception {
-    log.info("Starting");
+    log.info("Starting " + getClass().getSimpleName());
     vertx.eventBus().consumer(
         ADDR,
         (Message<Object> event) -> {
           event.reply(myComponent.getReply());
         }
     );
+  }
+
+  @Override
+  public void stop() throws Exception {
+    log.info("Stopping " + getClass().getSimpleName());
   }
 }
