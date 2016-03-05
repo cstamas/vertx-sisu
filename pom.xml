@@ -18,9 +18,9 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
 
-    <vertx.version>3.2.0</vertx.version>
+    <vertx.version>3.2.1</vertx.version>
     <aether.version>1.0.2.v20150114</aether.version>
-    <sisu.version>0.3.2</sisu.version>
+    <sisu.version>0.3.3</sisu.version>
   </properties>
 
   <modules>
