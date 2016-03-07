@@ -1,20 +1,19 @@
 package org.cstamas.vertx.sisu;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.Verticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.logging.Logger;
@@ -63,37 +62,38 @@ public class BootstrapVerticle
   @Override
   public void start(final Future<Void> startFuture) throws Exception {
     log.debug("Starting bootstrap verticle");
-    AtomicInteger atomicInteger = new AtomicInteger(verticles.size());
+    List<Future> futures = new ArrayList<>(verticles.size());
     for (Verticle verticle : verticles.values()) {
       Future<Void> f = Future.future();
-      f.setHandler(delegatingHandler(atomicInteger, startFuture));
       verticle.start(f);
+      futures.add(f);
     }
+    CompositeFuture.all(futures).setHandler(ar -> {
+      if (ar.succeeded()) {
+        startFuture.complete();
+      }
+      else {
+        startFuture.fail(ar.cause());
+      }
+    });
   }
 
   @Override
   public void stop(final Future<Void> stopFuture) throws Exception {
     log.debug("Stopping bootstrap verticle");
-    AtomicInteger atomicInteger = new AtomicInteger(verticles.size());
+    List<Future> futures = new ArrayList<>(verticles.size());
     for (Verticle verticle : verticles.values()) {
       Future<Void> f = Future.future();
-      f.setHandler(delegatingHandler(atomicInteger, stopFuture));
       verticle.stop(f);
+      futures.add(f);
     }
-  }
-
-  @Nonnull
-  private Handler<AsyncResult<Void>> delegatingHandler(final AtomicInteger counter,
-                                                       final Future<Void> lifecycleFuture)
-  {
-    return (AsyncResult<Void> event) -> {
-      int val = counter.decrementAndGet();
-      if (event.failed()) {
-        lifecycleFuture.fail(event.cause());
+    CompositeFuture.all(futures).setHandler(ar -> {
+      if (ar.succeeded()) {
+        stopFuture.complete();
       }
-      else if (val == 0) {
-        lifecycleFuture.complete();
+      else {
+        stopFuture.fail(ar.cause());
       }
-    };
+    });
   }
 }
