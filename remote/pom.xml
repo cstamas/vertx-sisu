@@ -16,7 +16,6 @@
     <dependency>
       <groupId>org.cstamas.vertx</groupId>
       <artifactId>vertx-sisu-local</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>

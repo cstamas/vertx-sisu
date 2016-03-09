@@ -75,6 +75,25 @@
 
   <dependencyManagement>
     <dependencies>
+      <!-- vertx-sisu modules -->
+      <dependency>
+        <groupId>org.cstamas.vertx</groupId>
+        <artifactId>vertx-sisu-example</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.cstamas.vertx</groupId>
+        <artifactId>vertx-sisu-local</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.cstamas.vertx</groupId>
+        <artifactId>vertx-sisu-remote</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <dependency>
         <groupId>io.vertx</groupId>
         <artifactId>vertx-core</artifactId>
