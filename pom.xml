@@ -113,6 +113,12 @@
       </dependency>
 
       <dependency>
+        <groupId>javax.inject</groupId>
+        <artifactId>javax.inject</artifactId>
+        <version>1</version>
+      </dependency>
+
+      <dependency>
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>org.eclipse.sisu.inject</artifactId>
         <version>${sisu.version}</version>
@@ -169,7 +175,7 @@
       <dependency>
         <groupId>io.takari.aether</groupId>
         <artifactId>aether-connector-okhttp</artifactId>
-        <version>0.15.0</version>
+        <version>0.16.0</version>
       </dependency>
 
       <!-- Aether/Maven needs SLf4J at runtime -->
@@ -202,6 +208,10 @@
     </dependencies>
   </dependencyManagement>
 
+  <prerequisites>
+    <maven>3.3</maven>
+  </prerequisites>
+
   <build>
     <plugins>
       <plugin>
@@ -218,6 +228,9 @@
                 <requireJavaVersion>
                   <version>1.8.0</version>
                 </requireJavaVersion>
+                <requireMavenVersion>
+                  <version>3.3</version>
+                </requireMavenVersion>
               </rules>
             </configuration>
           </execution>
@@ -238,13 +251,23 @@
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>3.0.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-enforcer-plugin</artifactId>
           <version>1.4.1</version>
         </plugin>
         <plugin>
           <groupId>io.takari.maven.plugins</groupId>
           <artifactId>takari-lifecycle-plugin</artifactId>
-          <version>1.11.11</version>
+          <version>1.11.12</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.19.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -260,6 +283,11 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-gpg-plugin</artifactId>
           <version>1.6</version>
+        </plugin>
+        <plugin>
+          <groupId>org.eclipse.sisu</groupId>
+          <artifactId>sisu-maven-plugin</artifactId>
+          <version>${sisu.version}</version>
         </plugin>
       </plugins>
     </pluginManagement>
