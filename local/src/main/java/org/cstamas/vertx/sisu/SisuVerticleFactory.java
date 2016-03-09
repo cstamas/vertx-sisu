@@ -16,8 +16,8 @@ import static org.cstamas.vertx.sisu.Utilities.shareInstance;
 
 /**
  * A {@link VerticleFactory} that uses given class loader to create Sisu container and lookup {@link Verticle}
- * by FQ class name or name. Prefix is {@code sisu}. The {@link Verticle} should be annotated with {@link @Named} and
- * discoverable by Sisu.
+ * by FQ class name or name. Prefix is {@code sisu}. The {@link Verticle} should be annotated with
+ * {@link javax.inject.Named} and discoverable by Sisu Index.
  */
 public class SisuVerticleFactory
     implements VerticleFactory

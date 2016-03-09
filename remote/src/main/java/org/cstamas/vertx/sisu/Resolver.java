@@ -12,6 +12,9 @@ public interface Resolver
 {
   /**
    * Resolves passed in coordinates into list of files. Never returns {@code null}.
+   *
+   * @param coordinates the coordinates as string.
+   * @return List of resolved (and locally downloaded) files.
    */
   @Nonnull
   List<File> resolve(final String coordinates);

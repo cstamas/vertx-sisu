@@ -10,8 +10,8 @@ import static org.cstamas.vertx.sisu.Utilities.shareInstance;
 
 /**
  * A {@link VerticleFactory} that uses given class loader to create Sisu container and lookup all {@link Verticle}s
- * from it. Prefix is {@code sisu-local}. The {@link Verticle}s should be annotated with {@link @Named} and
- * discoverable by Sisu.
+ * from it. Prefix is {@code sisu-local}. The {@link Verticle}s should be annotated with {@code javax.inject.Named} and
+ * discoverable by Sisu Index.
  */
 public class SisuLocalVerticleFactory
     implements VerticleFactory

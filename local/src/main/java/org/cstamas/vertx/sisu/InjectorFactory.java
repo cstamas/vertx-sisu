@@ -11,6 +11,9 @@ public interface InjectorFactory
 {
   /**
    * Creates sisu enabled {@link Injector}. Implementation may cache injectors.
+   *
+   * @param classLoader the {@link ClassLoader} to create SISU Class space from.
+   * @return SISU enabled Guice injector.
    */
   @Nonnull
   Injector injectorFor(final ClassLoader classLoader);
