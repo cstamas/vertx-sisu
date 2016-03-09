@@ -2,6 +2,12 @@
 
 Adds [Eclipse Sisu](https://www.eclipse.org/sisu/) enabled DI to Vert.x.
 
+[![wercker status](https://app.wercker.com/status/623418de74cd5f685731891a074af71d/m "wercker status")](https://app.wercker.com/project/bykey/623418de74cd5f685731891a074af71d)
+
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.cstamas.vertx/vertx-sisu/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.cstamas.vertx/vertx-sisu)
+
+
+
 ## `vertx-sisu-local` module
 
 Heavily inspired by Vert.x `vertx-service-factory`. Provides following prefixes:
