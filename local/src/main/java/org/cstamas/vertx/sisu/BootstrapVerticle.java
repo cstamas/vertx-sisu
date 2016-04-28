@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -19,7 +20,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
-import static java.util.Objects.requireNonNull;
+import static org.cstamas.vertx.sisu.Filters.filterFromString;
 
 /**
  * Bootstrap {@link Verticle} that gets {@link Map} of {@link Verticle}s injected by Sisu, and it simply relays the
@@ -37,20 +38,20 @@ public class BootstrapVerticle
 
   private Map<String, Verticle> verticles;
 
-  public BootstrapVerticle(final Predicate<String> filter) {
-    this.filter = requireNonNull(filter);
-  }
-
   @Inject
-  public void populateVerticles(final Map<String, Verticle> verticleMap) {
-    verticles = verticleMap.entrySet().stream()
-        .filter(e -> filter.test(e.getKey()))
+  public BootstrapVerticle(@Nullable @Named("bootstrap.filter") final String filter,
+                           final Map<String, Verticle> verticleMap)
+  {
+    this.filter = filterFromString(filter);
+    this.verticles = verticleMap.entrySet().stream()
+        .filter(e -> !NAME.equals(e.getKey()) && this.filter.test(e.getKey()))
         .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
     if (verticles.isEmpty()) {
-      throw new IllegalArgumentException(
-          "No verticle participates in bootstrap? (are they discoverable, or filter filtered out all of them?)");
+      // TODO: should we fail here or WARN is enough?
+      log.warn("No verticle participates in bootstrap? (are they discoverable, or filter '" + filter +
+          "' filtered out all of them?)");
     }
-    log.debug("Bootstrapping following verticles: " + verticles);
+    log.debug("filter='" + filter + "', bootstrapping=" + verticles.keySet());
   }
 
   @Override

@@ -15,7 +15,7 @@ import io.vertx.core.spi.VerticleFactory;
 
 /**
  * A {@link VerticleFactory} that uses given coordinate to download remote artifact (with dependencies), and then
- * delegate verticle creation to {@link SisuLocalVerticleFactory} to lookup all {@link Verticle}s from it. Prefix is
+ * delegate verticle creation to {@link SisuVerticleFactory} to lookup all {@link Verticle}s from it. Prefix is
  * {@code sisu-remote}.
  */
 public class SisuRemoteVerticleFactory
@@ -85,12 +85,12 @@ public class SisuRemoteVerticleFactory
         deploymentOptions.setExtraClasspath(extraCP);
         deploymentOptions.setIsolationGroup("__vertx_sisu_" + coordsString);
         if (serviceFilter != null) {
-          resolution.complete(SisuLocalVerticleFactory.PREFIX
+          resolution.complete(SisuVerticleFactory.PREFIX
               + ":" + BootstrapVerticle.NAME
               + "::" + serviceFilter);
         }
         else {
-          resolution.complete(SisuLocalVerticleFactory.PREFIX
+          resolution.complete(SisuVerticleFactory.PREFIX
               + ":" + BootstrapVerticle.NAME);
         }
       }

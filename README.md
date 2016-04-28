@@ -1,21 +1,26 @@
 # Vert.x Eclipse Sisu Extension
 
-Adds [Eclipse Sisu](https://www.eclipse.org/sisu/) enabled DI to Vert.x.
+Adds [Eclipse Sisu](https://www.eclipse.org/sisu/) enabled DI to Vert.x. In other words, allows you to enjoy
+all the cool benefits of Eclipse SISU and Google Guice together.
 
 [![wercker status](https://app.wercker.com/status/623418de74cd5f685731891a074af71d/m "wercker status")](https://app.wercker.com/project/bykey/623418de74cd5f685731891a074af71d)
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.cstamas.vertx/vertx-sisu/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.cstamas.vertx/vertx-sisu)
 
 
+## Bound Vertx components
+
+When SISUized verticle booted, following extra bindings will be available (aside of your components and verticles):
+
+* `io.vertx.core.Vertx` - the vertx instance
+* `io.vertx.core.eventbus.EventBus` - the vertx Event bus (result of `vertx.eventBus()`)
+* `io.vertx.core.DeploymentOptions` - the deployment options of the verticle, to grab configuration
 
 ## `vertx-sisu-local` module
 
-Heavily inspired by Vert.x `vertx-service-factory`. Provides following prefixes:
+Heavily inspired by Vert.x `vertx-service-factory`. Provides following prefix:
 
-* `sisu` - for loading up single verticle by name or FQCN
-* `sisu-local` - for bootstrapping a complete set of verticles
-
-### `sisu` prefix
+* `sisu` - for loading up single verticle by name or FQCN or bootstrap multiple verticles
 
 The `sisu` prefix uses following syntax:
 
@@ -26,41 +31,47 @@ sisu:verticleName
 where
 
 ```
-verticleName := <fully qualified class name> | <name as applied by @Named>
+verticleName := <fully qualified class name> | <name as applied by @Named> | "bootstrap"
 ```
 
-Usable when Verticle you want to deploy is located in same classloader as your caller is.
+Usable when Verticle you want to deploy is located in same classloader as your caller is (like uber-jar or
+when all you need is already on your application classpath).
 
 Examples:
 
 ```
-sisu:org.cstamas.vertx.sisu.examples.ExampleNamedVerticle
-sisu:myExample // if implementation has applied @Named("myExample")
+sisu:org.cstamas.vertx.sisu.examples.ExampleVerticle // by FCQN
+sisu:ExampleNamedVerticle // by @Named("ExampleNamedVerticle") on class
 ```
 
-### `sisu-local` prefix
-
-The `sisu-local` prefix currently uses following syntax:
+There is one "special" `verticleName`, the `bootstrap`. Bootstrap **searches and loads up all Verticle components,
+and starts them** (applies Vertx invoked lifecycle). In this mode, you can may filter which verticles you
+want to bootstrap using optional `filter`:
 
 ```
-sisu-local:bootstrap[::filter]
+sisu:bootstrap[::filter]
 ```
-where the "bootstrap" part is required and optional filter currently supports following modes
+
+The optional `filter` currently supports following modes
+
 ```
 filter := <not present> | <term + '*'> | <'*' + term> | <term>
 ```
+
 Meanings of those above are "all", "begins with term", "ends with term" and "equals with term" consecutively.
 
 Usable when you want to "bootstrap" a set of verticles from same "class space" (sisu term, basically all Verticles
 discovered by sisu in given class loader).
 
 Examples:
+
 ```
-sisu-local:bootstrap // all
-sisu-local:bootstrap::ExampleNamed* // begins with 'ExampleNamed'
-sisu-local:bootstrap::*NamedVerticle // ends with 'NamedVerticle'
-sisu-local:bootstrap::ExampleNamedVerticle // equals with 'ExampleNamedVerticle'
+sisu:bootstrap // would load up and bootstrap all found verticle components in classpath
+sisu:bootstrap::Example* // would load up and bootstrap only verticles that name starts with "Example"
+sisu:bootstrap::*Verticle // would load up and bootstrap only verticles that name ends with "Verticle"
+sisu:bootstrap::ExampleNamedVerticle // would load up and bootstrap only verticle having name "ExampleNamedVerticle"
 ```
+
 
 ## `vertx-sisu-remote` module
 
@@ -80,7 +91,7 @@ Where `artifactCoordinate` is the usual Maven artifact "one liner":
 ```
 artifactCoordinate := groupId:artifactId[:extension[:classifier]]:version
 ```
-and optional filter currently supports same modes as `sisu-local` filter.
+and optional `filter` currently supports same modes as `sisu` filter.
 
 Usable when you want to "bootstrap" a set of verticles from module downloaded from Maven2 repository.
 
@@ -123,7 +134,7 @@ You might want to add specific names, in that case use `@Named("myName")`. Do NO
 with `@Singleton`, as that might result in unexpected situation for Vert.x itself.
 * make sure sisu index is generated for your JAR. You can have that either by using org.eclipse.sisu:sisu-maven-plugin
 maven plugin, or, by having org.eclipse.sisu:org.eclipse.sisu.inject dependency on compile classpath (latter is not quite
-usual, as sisu is more a runtime dependency as compile time)
+usual, as sisu is more a runtime dependency then compile time)
 
 # Building it
 

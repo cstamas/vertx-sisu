@@ -3,6 +3,7 @@ package org.cstamas.vertx.sisu;
 import javax.annotation.Nonnull;
 
 import com.google.inject.Injector;
+import com.google.inject.Module;
 
 /**
  * {@link Injector} factory.
@@ -16,5 +17,5 @@ public interface InjectorFactory
    * @return SISU enabled Guice injector.
    */
   @Nonnull
-  Injector injectorFor(final ClassLoader classLoader);
+  Injector injectorFor(ClassLoader classLoader, Module... modules);
 }

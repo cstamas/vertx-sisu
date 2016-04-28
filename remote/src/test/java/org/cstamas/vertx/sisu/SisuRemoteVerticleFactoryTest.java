@@ -1,8 +1,10 @@
 package org.cstamas.vertx.sisu;
 
 import io.vertx.core.AsyncResult;
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -30,7 +32,16 @@ public class SisuRemoteVerticleFactoryTest
   public void verifyBothDeployed(TestContext testContext) {
     vertx.deployVerticle(
         "sisu-remote:org.cstamas.vertx:vertx-sisu-example:1.0.0-SNAPSHOT",
-        verifyBothDeployedHandler(testContext)
+        verifyBothDeployedHandler(testContext, "DEFAULT")
+    );
+  }
+
+  @Test
+  public void verifyBothDeployedWithConfig(TestContext testContext) {
+    vertx.deployVerticle(
+        "sisu-remote:org.cstamas.vertx:vertx-sisu-example:1.0.0-SNAPSHOT",
+        new DeploymentOptions().setConfig(new JsonObject().put("reply.test", "verifyBothDeployedWithConfig")),
+        verifyBothDeployedHandler(testContext, "verifyBothDeployedWithConfig")
     );
   }
 
@@ -38,7 +49,7 @@ public class SisuRemoteVerticleFactoryTest
   public void verifyEndsWithFilter(TestContext testContext) {
     vertx.deployVerticle(
         "sisu-remote:org.cstamas.vertx:vertx-sisu-example:1.0.0-SNAPSHOT::*NamedVerticle",
-        verifyExample2DeployedOnlyHandler(testContext)
+        verifyExample2DeployedOnlyHandler(testContext, "DEFAULT")
     );
   }
 
@@ -46,7 +57,7 @@ public class SisuRemoteVerticleFactoryTest
   public void verifyStartsWithFilter(TestContext testContext) {
     vertx.deployVerticle(
         "sisu-remote:org.cstamas.vertx:vertx-sisu-example:1.0.0-SNAPSHOT::ExampleNamed*",
-        verifyExample2DeployedOnlyHandler(testContext)
+        verifyExample2DeployedOnlyHandler(testContext, "DEFAULT")
     );
   }
 
@@ -54,12 +65,12 @@ public class SisuRemoteVerticleFactoryTest
   public void verifyEqualsFilter(TestContext testContext) {
     vertx.deployVerticle(
         "sisu-remote:org.cstamas.vertx:vertx-sisu-example:1.0.0-SNAPSHOT::ExampleNamedVerticle",
-        verifyExample2DeployedOnlyHandler(testContext)
+        verifyExample2DeployedOnlyHandler(testContext, "DEFAULT")
     );
   }
 
 
-  private Handler<AsyncResult<String>> verifyBothDeployedHandler(final TestContext testContext) {
+  private Handler<AsyncResult<String>> verifyBothDeployedHandler(final TestContext testContext, final String replyMsg) {
     Async async = testContext.async();
     return e -> {
       try {
@@ -68,14 +79,14 @@ public class SisuRemoteVerticleFactoryTest
             if (result.failed()) {
               testContext.fail(result.cause());
             }
-            testContext.assertEquals("Hello VertxImpl", result.result().body());
+            testContext.assertEquals("Hello " + replyMsg, result.result().body());
           });
 
           vertx.eventBus().<String>send("example2", null, result -> {
             if (result.failed()) {
               testContext.fail(result.cause());
             }
-            testContext.assertEquals("Hello VertxImpl", result.result().body());
+            testContext.assertEquals("Hello " + replyMsg, result.result().body());
           });
         }
         else {
@@ -88,7 +99,7 @@ public class SisuRemoteVerticleFactoryTest
     };
   }
 
-  private Handler<AsyncResult<String>> verifyExample2DeployedOnlyHandler(final TestContext testContext) {
+  private Handler<AsyncResult<String>> verifyExample2DeployedOnlyHandler(final TestContext testContext, final String replyMsg) {
     Async async = testContext.async();
     return e -> {
       try {
@@ -106,7 +117,7 @@ public class SisuRemoteVerticleFactoryTest
             if (result.failed()) {
               testContext.fail(result.cause());
             }
-            testContext.assertEquals("Hello VertxImpl", result.result().body());
+            testContext.assertEquals("Hello " + replyMsg, result.result().body());
           });
         }
         else {

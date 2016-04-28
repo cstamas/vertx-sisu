@@ -11,6 +11,7 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Stage;
 import io.vertx.core.Vertx;
+import io.vertx.core.eventbus.EventBus;
 import org.eclipse.sisu.space.BeanScanning;
 import org.eclipse.sisu.space.SpaceModule;
 import org.eclipse.sisu.space.URLClassSpace;
@@ -27,11 +28,9 @@ public class SimpleInjectorFactory
 {
   private final Vertx vertx;
 
-  @Nullable
   private final Map<String, String> parameters;
 
-  @Nullable
-  private final List<Module> modules;
+  private final List<Module> bootstrapModules;
 
   public SimpleInjectorFactory(final Vertx vertx) {
     this(vertx, null, null);
@@ -39,15 +38,15 @@ public class SimpleInjectorFactory
 
   public SimpleInjectorFactory(final Vertx vertx,
                                @Nullable final Map<String, String> parameters,
-                               @Nullable final List<Module> modules)
+                               @Nullable final List<Module> bootstrapModules)
   {
     this.vertx = requireNonNull(vertx);
     this.parameters = parameters;
-    this.modules = modules;
+    this.bootstrapModules = bootstrapModules;
   }
 
   @Override
-  public Injector injectorFor(final ClassLoader classLoader)
+  public Injector injectorFor(final ClassLoader classLoader, final Module... modules)
   {
     return Guice.createInjector(
         Stage.DEVELOPMENT,
@@ -57,13 +56,17 @@ public class SimpleInjectorFactory
               @Override
               protected void configure() {
                 bind(Vertx.class).toInstance(vertx);
+                bind(EventBus.class).toInstance(vertx.eventBus());
                 if (parameters != null) {
                   bind(ParameterKeys.PROPERTIES).toInstance(parameters);
                 }
-                if (modules != null) {
-                  for (Module module : modules) {
-                    install(module);
+                if (bootstrapModules != null) {
+                  for (Module bootstrapModule : bootstrapModules) {
+                    install(bootstrapModule);
                   }
+                }
+                for (Module module : modules) {
+                  install(module);
                 }
               }
             },

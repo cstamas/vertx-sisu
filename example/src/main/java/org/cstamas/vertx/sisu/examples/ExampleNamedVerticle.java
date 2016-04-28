@@ -5,20 +5,19 @@ import javax.inject.Named;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.Message;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
+import io.vertx.core.eventbus.MessageConsumer;
 
 @Named(ExampleNamedVerticle.NAME)
 public class ExampleNamedVerticle
     extends AbstractVerticle
 {
-  private static final Logger log = LoggerFactory.getLogger(ExampleNamedVerticle.class);
-
   public static final String NAME = "ExampleNamedVerticle";
 
   public static final String ADDR = "example2";
 
   private final MyComponent myComponent;
+
+  private MessageConsumer messageConsumer;
 
   @Inject
   public ExampleNamedVerticle(MyComponent myComponent)
@@ -28,8 +27,7 @@ public class ExampleNamedVerticle
 
   @Override
   public void start() throws Exception {
-    log.info("Starting " + getClass().getSimpleName());
-    vertx.eventBus().consumer(
+    messageConsumer = vertx.eventBus().consumer(
         ADDR,
         (Message<Object> event) -> {
           event.reply(myComponent.getReply());
@@ -39,6 +37,8 @@ public class ExampleNamedVerticle
 
   @Override
   public void stop() throws Exception {
-    log.info("Stopping " + getClass().getSimpleName());
+    if (messageConsumer != null) {
+      messageConsumer.unregister();
+    }
   }
 }
