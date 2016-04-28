@@ -16,6 +16,8 @@ When SISUized verticle booted, following extra bindings will be available (aside
 * `io.vertx.core.eventbus.EventBus` - the vertx Event bus (result of `vertx.eventBus()`)
 * `io.vertx.core.DeploymentOptions` - the deployment options of the verticle, to grab configuration
 
+In other words, these can be injected into your Verticles or components.
+
 ## `vertx-sisu-local` module
 
 Heavily inspired by Vert.x `vertx-service-factory`. Provides following prefix:
