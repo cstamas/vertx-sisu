@@ -17,5 +17,5 @@ public interface InjectorFactory
    * @return SISU enabled Guice injector.
    */
   @Nonnull
-  Injector injectorFor(ClassLoader classLoader, Module... modules);
+  Injector injectorFor(ClassLoader classLoader, Iterable<Module> modules);
 }

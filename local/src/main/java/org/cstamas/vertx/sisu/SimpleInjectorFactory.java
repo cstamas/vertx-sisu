@@ -46,7 +46,7 @@ public class SimpleInjectorFactory
   }
 
   @Override
-  public Injector injectorFor(final ClassLoader classLoader, final Module... modules)
+  public Injector injectorFor(final ClassLoader classLoader, final Iterable<Module> modules)
   {
     return Guice.createInjector(
         Stage.DEVELOPMENT,

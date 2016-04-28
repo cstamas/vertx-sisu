@@ -2,10 +2,9 @@ package org.cstamas.vertx.sisu;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.IdentityHashMap;
+import java.util.HashMap;
 import java.util.Iterator;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Module;
@@ -14,6 +13,8 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Verticle;
 import io.vertx.core.Vertx;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.spi.VerticleFactory;
 import org.eclipse.sisu.BeanEntry;
 import org.eclipse.sisu.inject.BeanLocator;
@@ -26,9 +27,11 @@ import org.eclipse.sisu.inject.BeanLocator;
 public class SisuVerticleFactory
     implements VerticleFactory
 {
+  private static final Logger log = LoggerFactory.getLogger(SisuVerticleFactory.class);
+
   public static final String PREFIX = "sisu";
 
-  private IdentityHashMap<ClassLoader, Injector> injectorsByClassloader;
+  private HashMap<String, Injector> injectorsByIdentifier;
 
   private InjectorFactory injectorFactory;
 
@@ -39,7 +42,7 @@ public class SisuVerticleFactory
 
   @Override
   public void init(final Vertx vertx) {
-    this.injectorsByClassloader = new IdentityHashMap<>();
+    this.injectorsByIdentifier = new HashMap<>();
     this.injectorFactory = new SimpleInjectorFactory(vertx);
   }
 
@@ -59,42 +62,33 @@ public class SisuVerticleFactory
                                    ClassLoader classLoader,
                                    Future<String> resolution)
   {
+    log.debug("resolve: " + identifier);
+
     ArrayList<Module> modules = new ArrayList<>(1);
-    String identifierNoPrefix = VerticleFactory.removePrefix(identifier);
-    String verticleName = identifierNoPrefix;
-    int pos = identifierNoPrefix.lastIndexOf("::");
-    if (pos != -1) {
-      verticleName = identifierNoPrefix.substring(0, pos);
-      String serviceFilter = identifierNoPrefix.substring(pos + 2);
-      modules.add(new AbstractModule()
-      {
-        @Override
-        protected void configure() {
-          bindConstant().annotatedWith(Names.named("bootstrap.filter")).to(serviceFilter);
-        }
-      });
+    modules.add(binder -> binder.bind(DeploymentOptions.class).toInstance(deploymentOptions));
+    final String serviceFilter = parseIdentifier(identifier).serviceFilter;
+    if (serviceFilter != null) {
+      modules.add(binder -> binder.bindConstant().annotatedWith(Names.named("bootstrap.filter")).to(serviceFilter));
     }
 
-    modules.add(binder ->
-        binder.bind(DeploymentOptions.class).toInstance(deploymentOptions));
-
-    if (!injectorsByClassloader.containsKey(classLoader)) {
-      injectorsByClassloader.put(
-          classLoader,
-          injectorFactory.injectorFor(
-              classLoader,
-              modules.toArray(new Module[modules.size()])
-          )
+    if (!injectorsByIdentifier.containsKey(identifier)) {
+      injectorsByIdentifier.put(
+          identifier,
+          injectorFactory.injectorFor(classLoader, modules)
       );
     }
-    resolution.complete(PREFIX + ":" + verticleName);
+    else {
+      throw new IllegalArgumentException("Verticle " + identifier + " already looked up!");
+    }
+    resolution.complete(identifier); // return identifier to not re-resolve
   }
 
   @Override
   public Verticle createVerticle(final String identifier, final ClassLoader classLoader) throws Exception {
-    String verticleName = VerticleFactory.removePrefix(identifier);
+    final String verticleName = parseIdentifier(identifier).verticleName;
 
-    final Injector verticleInjector = injectorsByClassloader.get(classLoader);
+    //final Injector verticleInjector = injectorsByClassloader.get(classLoader);
+    final Injector verticleInjector = injectorsByIdentifier.get(identifier);
     final BeanLocator beanLocator = verticleInjector.getInstance(BeanLocator.class);
 
     final Class clazz = tryToLoadClass(classLoader, verticleName);
@@ -106,7 +100,7 @@ public class SisuVerticleFactory
     }
   }
 
-  private Class<?> tryToLoadClass(final ClassLoader classLoader, final String className) {
+  private static Class<?> tryToLoadClass(final ClassLoader classLoader, final String className) {
     try {
       return classLoader.loadClass(className);
     }
@@ -115,13 +109,37 @@ public class SisuVerticleFactory
     }
   }
 
-  private Verticle lookup(final BeanLocator beanLocator, final Key<Verticle> key) {
+  private static Verticle lookup(final BeanLocator beanLocator, final Key<Verticle> key) {
     Iterator<? extends BeanEntry<Annotation, Verticle>> iterator = beanLocator.locate(key).iterator();
     if (iterator.hasNext()) {
       return iterator.next().getProvider().get(); // using provider to support non-singleton pattern
     }
     else {
       return null;
+    }
+  }
+
+  private static Identifier parseIdentifier(String identifier) {
+    String identifierNoPrefix = VerticleFactory.removePrefix(identifier);
+    String verticleName = identifierNoPrefix;
+    String serviceFilter = null;
+    int pos = identifierNoPrefix.lastIndexOf("::");
+    if (pos != -1) {
+      verticleName = identifierNoPrefix.substring(0, pos);
+      serviceFilter = identifierNoPrefix.substring(pos + 2);
+    }
+    return new Identifier(verticleName, serviceFilter);
+  }
+
+  private static class Identifier
+  {
+    private final String verticleName;
+
+    private final String serviceFilter;
+
+    private Identifier(final String verticleName, final String serviceFilter) {
+      this.verticleName = verticleName;
+      this.serviceFilter = serviceFilter;
     }
   }
 }

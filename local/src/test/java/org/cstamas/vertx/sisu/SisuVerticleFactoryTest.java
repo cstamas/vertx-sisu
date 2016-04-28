@@ -10,6 +10,7 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.cstamas.vertx.sisu.examples.ExampleNamedVerticle;
+import org.cstamas.vertx.sisu.examples.ExampleVerticle;
 import org.cstamas.vertx.sisu.examples.MyComponent;
 import org.junit.After;
 import org.junit.Before;
@@ -60,8 +61,8 @@ public class SisuVerticleFactoryTest
   public void bootstrapWithFilterWithConfig(TestContext testContext) throws Exception {
     vertx.deployVerticle(
         "sisu:" + BootstrapVerticle.NAME + "::*Verticle",
-        new DeploymentOptions().setConfig(new JsonObject().put("reply.test", "bootstrapWithConfig")),
-        verifyAddressIsAliveHandler(testContext, ExampleNamedVerticle.ADDR, "bootstrapWithConfig")
+        new DeploymentOptions().setConfig(new JsonObject().put("reply.test", "bootstrapWithFilterWithConfig")),
+        verifyAddressIsAliveHandler(testContext, ExampleNamedVerticle.ADDR, "bootstrapWithFilterWithConfig")
     );
   }
 
@@ -99,6 +100,21 @@ public class SisuVerticleFactoryTest
         verifyAddressIsAliveHandler(testContext, ExampleNamedVerticle.ADDR, "byNameWithConfig")
     );
   }
+
+  @Test
+  public void twoByClassWithConfig(TestContext testContext) throws Exception {
+    vertx.deployVerticle(
+        "sisu:" + ExampleNamedVerticle.class.getName(),
+        new DeploymentOptions().setConfig(new JsonObject().put("reply.test", "ExampleNamedVerticle")),
+        verifyAddressIsAliveHandler(testContext, ExampleNamedVerticle.ADDR, "ExampleNamedVerticle")
+    );
+    vertx.deployVerticle(
+        "sisu:" + ExampleVerticle.class.getName(),
+        new DeploymentOptions().setConfig(new JsonObject().put("reply.test", "ExampleVerticle")),
+        verifyAddressIsAliveHandler(testContext, ExampleVerticle.ADDR, "ExampleVerticle")
+    );
+  }
+
 
   private Handler<AsyncResult<String>> verifyAddressIsAliveHandler(final TestContext testContext,
                                                                    final String address,
