@@ -13,6 +13,8 @@ import io.vertx.core.Verticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.spi.VerticleFactory;
 
+import static org.cstamas.vertx.sisu.Identifier.parseIdentifier;
+
 /**
  * A {@link VerticleFactory} that uses given coordinate to download remote artifact (with dependencies), and then
  * delegate verticle creation to {@link SisuVerticleFactory} to lookup all {@link Verticle}s from it. Prefix is
@@ -45,23 +47,16 @@ public class SisuRemoteVerticleFactory
 
   @Override
   public void resolve(
-      final String identifier,
+      final String identifierStr,
       final DeploymentOptions deploymentOptions,
       final ClassLoader classLoader,
       final Future<String> resolution)
   {
     vertx.<Void>executeBlocking(fut -> {
       try {
-        String identifierNoPrefix = VerticleFactory.removePrefix(identifier);
-        String coordsString = identifierNoPrefix;
-        String serviceFilter = null;
-        int pos = identifierNoPrefix.lastIndexOf("::");
-        if (pos != -1) {
-          coordsString = identifierNoPrefix.substring(0, pos);
-          serviceFilter = identifierNoPrefix.substring(pos + 2);
-        }
+        final Identifier identifier = parseIdentifier(identifierStr);
 
-        List<File> artifacts = resolver.resolve(coordsString);
+        List<File> artifacts = resolver.resolve(identifier.getVerticleName());
 
         // Generate the classpath - if the jar is already on the Vert.x classpath (e.g. the Vert.x dependencies, netty etc)
         // then we don't add it to the classpath for the module
@@ -83,11 +78,11 @@ public class SisuRemoteVerticleFactory
         }
 
         deploymentOptions.setExtraClasspath(extraCP);
-        deploymentOptions.setIsolationGroup("__vertx_sisu_" + coordsString);
-        if (serviceFilter != null) {
+        deploymentOptions.setIsolationGroup("__vertx_sisu_" + identifier.getVerticleName());
+        if (identifier.getServiceFilter() != null) {
           resolution.complete(SisuVerticleFactory.PREFIX
               + ":" + BootstrapVerticle.NAME
-              + "::" + serviceFilter);
+              + "::" + identifier.getServiceFilter());
         }
         else {
           resolution.complete(SisuVerticleFactory.PREFIX

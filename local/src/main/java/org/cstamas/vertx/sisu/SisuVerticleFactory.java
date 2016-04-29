@@ -19,6 +19,8 @@ import io.vertx.core.spi.VerticleFactory;
 import org.eclipse.sisu.BeanEntry;
 import org.eclipse.sisu.inject.BeanLocator;
 
+import static org.cstamas.vertx.sisu.Identifier.parseIdentifier;
+
 /**
  * A {@link VerticleFactory} that uses given class loader to create Sisu container and lookup {@link Verticle}
  * by FQ class name or name. Prefix is {@code sisu}. The {@link Verticle} should be annotated with
@@ -31,7 +33,7 @@ public class SisuVerticleFactory
 
   public static final String PREFIX = "sisu";
 
-  private HashMap<String, Injector> injectorsByIdentifier;
+  private HashMap<Identifier, Injector> injectorsByIdentifier;
 
   private InjectorFactory injectorFactory;
 
@@ -57,46 +59,41 @@ public class SisuVerticleFactory
   }
 
   @Override
-  public synchronized void resolve(String identifier,
+  public synchronized void resolve(String identifierStr,
                                    DeploymentOptions deploymentOptions,
                                    ClassLoader classLoader,
                                    Future<String> resolution)
   {
-    log.debug("resolve: " + identifier);
+    log.debug("resolve: " + identifierStr);
 
     ArrayList<Module> modules = new ArrayList<>(1);
     modules.add(binder -> binder.bind(DeploymentOptions.class).toInstance(deploymentOptions));
-    final String serviceFilter = parseIdentifier(identifier).serviceFilter;
-    if (serviceFilter != null) {
-      modules.add(binder -> binder.bindConstant().annotatedWith(Names.named("bootstrap.filter")).to(serviceFilter));
+    final Identifier identifier = parseIdentifier(identifierStr);
+    if (identifier.getServiceFilter() != null) {
+      modules.add(binder -> binder.bindConstant()
+          .annotatedWith(Names.named("bootstrap.filter"))
+          .to(identifier.getServiceFilter()));
     }
-
     if (!injectorsByIdentifier.containsKey(identifier)) {
-      injectorsByIdentifier.put(
-          identifier,
-          injectorFactory.injectorFor(classLoader, modules)
-      );
+      injectorsByIdentifier.put(identifier, injectorFactory.injectorFor(classLoader, modules));
     }
     else {
       throw new IllegalArgumentException("Verticle " + identifier + " already looked up!");
     }
-    resolution.complete(identifier); // return identifier to not re-resolve
+    resolution.complete(identifierStr); // return same identifier to not re-resolve
   }
 
   @Override
-  public Verticle createVerticle(final String identifier, final ClassLoader classLoader) throws Exception {
-    final String verticleName = parseIdentifier(identifier).verticleName;
-
-    //final Injector verticleInjector = injectorsByClassloader.get(classLoader);
+  public Verticle createVerticle(final String identifierStr, final ClassLoader classLoader) throws Exception {
+    final Identifier identifier = parseIdentifier(identifierStr);
     final Injector verticleInjector = injectorsByIdentifier.get(identifier);
     final BeanLocator beanLocator = verticleInjector.getInstance(BeanLocator.class);
-
-    final Class clazz = tryToLoadClass(classLoader, verticleName);
+    final Class clazz = tryToLoadClass(classLoader, identifier.getVerticleName());
     if (clazz != null) { // try by class
       return lookup(beanLocator, Key.get(clazz));
     }
     else { // try by name
-      return lookup(beanLocator, Key.get(Verticle.class, Names.named(verticleName)));
+      return lookup(beanLocator, Key.get(Verticle.class, Names.named(identifier.getVerticleName())));
     }
   }
 
@@ -116,30 +113,6 @@ public class SisuVerticleFactory
     }
     else {
       return null;
-    }
-  }
-
-  private static Identifier parseIdentifier(String identifier) {
-    String identifierNoPrefix = VerticleFactory.removePrefix(identifier);
-    String verticleName = identifierNoPrefix;
-    String serviceFilter = null;
-    int pos = identifierNoPrefix.lastIndexOf("::");
-    if (pos != -1) {
-      verticleName = identifierNoPrefix.substring(0, pos);
-      serviceFilter = identifierNoPrefix.substring(pos + 2);
-    }
-    return new Identifier(verticleName, serviceFilter);
-  }
-
-  private static class Identifier
-  {
-    private final String verticleName;
-
-    private final String serviceFilter;
-
-    private Identifier(final String verticleName, final String serviceFilter) {
-      this.verticleName = verticleName;
-      this.serviceFilter = serviceFilter;
     }
   }
 }

@@ -39,19 +39,20 @@ public class BootstrapVerticle
   private Map<String, Verticle> verticles;
 
   @Inject
-  public BootstrapVerticle(@Nullable @Named("bootstrap.filter") final String filter,
+  public BootstrapVerticle(@Nullable @Named("bootstrap.filter") final String filterString,
                            final Map<String, Verticle> verticleMap)
   {
-    this.filter = filterFromString(filter);
+    this.filter = filterFromString(filterString);
     this.verticles = verticleMap.entrySet().stream()
-        .filter(e -> !NAME.equals(e.getKey()) && this.filter.test(e.getKey()))
+        .filter(e -> !NAME.equals(e.getKey()) && filter.test(e.getKey()))
         .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
     if (verticles.isEmpty()) {
-      // TODO: should we fail here or WARN is enough?
       log.warn("No verticle participates in bootstrap? (are they discoverable, or filter '" + filter +
           "' filtered out all of them?)");
     }
-    log.debug("filter='" + filter + "', bootstrapping=" + verticles.keySet());
+    else {
+      log.debug("Bootstrap verticle(filter='" + filterString + "', verticles=" + verticles.keySet() + ")");
+    }
   }
 
   @Override
