@@ -241,9 +241,10 @@
         <artifactId>takari-lifecycle-plugin</artifactId>
         <extensions>true</extensions>
         <configuration>
-          <accessRulesViolation>error</accessRulesViolation>
-          <compilerId>javac</compilerId>
-          <proc>proc</proc>
+          <transitiveDependencyReference>error</transitiveDependencyReference>
+          <privatePackageReference>error</privatePackageReference>
+          <compilerId>jdt</compilerId>
+          <proc>none</proc>
         </configuration>
       </plugin>
     </plugins>
