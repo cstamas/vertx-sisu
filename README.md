@@ -18,6 +18,9 @@ When SISUized verticle booted, following extra bindings will be available (aside
 
 In other words, these can be injected into your Verticles or components.
 
+Current limitation: each deploy verticle invocation will create isolated
+injector.
+
 ## `vertx-sisu-local` module
 
 Heavily inspired by Vert.x `vertx-service-factory`. Provides following prefix:
