@@ -241,6 +241,7 @@
         <artifactId>takari-lifecycle-plugin</artifactId>
         <extensions>true</extensions>
         <configuration>
+          <accessRulesViolation>error</accessRulesViolation>
           <compilerId>javac</compilerId>
           <proc>proc</proc>
         </configuration>
