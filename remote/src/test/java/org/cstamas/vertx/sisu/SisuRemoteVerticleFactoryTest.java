@@ -31,7 +31,7 @@ public class SisuRemoteVerticleFactoryTest
   @Test
   public void verifyBothDeployed(TestContext testContext) {
     vertx.deployVerticle(
-        "sisu-remote:org.cstamas.vertx:vertx-sisu-example:1.0.0-SNAPSHOT",
+        "sisu-remote:org.cstamas.vertx.sisu:vertx-sisu-example:1.0.0-SNAPSHOT",
         verifyBothDeployedHandler(testContext, "DEFAULT")
     );
   }
@@ -39,7 +39,7 @@ public class SisuRemoteVerticleFactoryTest
   @Test
   public void verifyBothDeployedWithConfig(TestContext testContext) {
     vertx.deployVerticle(
-        "sisu-remote:org.cstamas.vertx:vertx-sisu-example:1.0.0-SNAPSHOT",
+        "sisu-remote:org.cstamas.vertx.sisu:vertx-sisu-example:1.0.0-SNAPSHOT",
         new DeploymentOptions().setConfig(new JsonObject().put("reply.test", "verifyBothDeployedWithConfig")),
         verifyBothDeployedHandler(testContext, "verifyBothDeployedWithConfig")
     );
@@ -48,7 +48,7 @@ public class SisuRemoteVerticleFactoryTest
   @Test
   public void verifyEndsWithFilter(TestContext testContext) {
     vertx.deployVerticle(
-        "sisu-remote:org.cstamas.vertx:vertx-sisu-example:1.0.0-SNAPSHOT::*NamedVerticle",
+        "sisu-remote:org.cstamas.vertx.sisu:vertx-sisu-example:1.0.0-SNAPSHOT::*NamedVerticle",
         verifyExample2DeployedOnlyHandler(testContext, "DEFAULT")
     );
   }
@@ -56,7 +56,7 @@ public class SisuRemoteVerticleFactoryTest
   @Test
   public void verifyStartsWithFilter(TestContext testContext) {
     vertx.deployVerticle(
-        "sisu-remote:org.cstamas.vertx:vertx-sisu-example:1.0.0-SNAPSHOT::ExampleNamed*",
+        "sisu-remote:org.cstamas.vertx.sisu:vertx-sisu-example:1.0.0-SNAPSHOT::ExampleNamed*",
         verifyExample2DeployedOnlyHandler(testContext, "DEFAULT")
     );
   }
@@ -64,7 +64,7 @@ public class SisuRemoteVerticleFactoryTest
   @Test
   public void verifyEqualsFilter(TestContext testContext) {
     vertx.deployVerticle(
-        "sisu-remote:org.cstamas.vertx:vertx-sisu-example:1.0.0-SNAPSHOT::ExampleNamedVerticle",
+        "sisu-remote:org.cstamas.vertx.sisu:vertx-sisu-example:1.0.0-SNAPSHOT::ExampleNamedVerticle",
         verifyExample2DeployedOnlyHandler(testContext, "DEFAULT")
     );
   }

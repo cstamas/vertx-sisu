@@ -3,8 +3,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.cstamas.vertx</groupId>
-    <artifactId>vertx-sisu</artifactId>
+    <groupId>org.cstamas.vertx.sisu</groupId>
+    <artifactId>parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
