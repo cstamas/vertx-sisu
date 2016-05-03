@@ -36,13 +36,13 @@
         a) using this plugin as below, or
         b) having org.eclipse.sisu:org.eclipse.sisu.inject on compile classpath
         -->
-        <groupId>org.eclipse.sisu</groupId>
-        <artifactId>sisu-maven-plugin</artifactId>
+        <groupId>io.takari.maven.plugins</groupId>
+        <artifactId>takari-lifecycle-plugin</artifactId>
         <executions>
           <execution>
             <id>index-project</id>
             <goals>
-              <goal>main-index</goal>
+              <goal>sisu-index</goal>
             </goals>
           </execution>
         </executions>

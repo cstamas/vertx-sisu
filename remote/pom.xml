@@ -105,13 +105,13 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.eclipse.sisu</groupId>
-        <artifactId>sisu-maven-plugin</artifactId>
+        <groupId>io.takari.maven.plugins</groupId>
+        <artifactId>takari-lifecycle-plugin</artifactId>
         <executions>
           <execution>
             <id>index-project</id>
             <goals>
-              <goal>main-index</goal>
+              <goal>sisu-index</goal>
             </goals>
           </execution>
         </executions>
