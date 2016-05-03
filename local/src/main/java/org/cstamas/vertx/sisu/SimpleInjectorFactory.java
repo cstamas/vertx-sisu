@@ -46,7 +46,7 @@ public class SimpleInjectorFactory
   }
 
   @Override
-  public Injector injectorFor(final ClassLoader classLoader, final Iterable<Module> modules)
+  public Injector injectorFor(final ClassLoader classLoader, @Nullable final Iterable<Module> modules)
   {
     return Guice.createInjector(
         Stage.DEVELOPMENT,
@@ -65,8 +65,10 @@ public class SimpleInjectorFactory
                     install(bootstrapModule);
                   }
                 }
-                for (Module module : modules) {
-                  install(module);
+                if (modules != null) {
+                  for (Module module : modules) {
+                    install(module);
+                  }
                 }
               }
             },
@@ -74,6 +76,23 @@ public class SimpleInjectorFactory
                 new URLClassSpace(classLoader), BeanScanning.INDEX
             )
         )
+    );
+  }
+
+  @Override
+  public Injector injectorFor(final Iterable<Module> modules)
+  {
+    return Guice.createInjector(
+        Stage.DEVELOPMENT,
+        new AbstractModule() // params
+        {
+          @Override
+          protected void configure() {
+            for (Module module : modules) {
+              install(module);
+            }
+          }
+        }
     );
   }
 }
