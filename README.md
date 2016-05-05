@@ -5,7 +5,7 @@ all the cool benefits of Eclipse SISU and Google Guice together.
 
 [![wercker status](https://app.wercker.com/status/623418de74cd5f685731891a074af71d/m "wercker status")](https://app.wercker.com/project/bykey/623418de74cd5f685731891a074af71d)
 
-[![maven central](https://maven-badges.herokuapp.com/maven-central/org.cstamas.vertx.sisu/vertx-sisu/badge.svg?subject=org.cstamas.vertx.sisu:vertx-sisu)](https://maven-badges.herokuapp.com/maven-central/org.cstamas.vertx.sisu/vertx-sisu)
+[![maven central](https://maven-badges.herokuapp.com/maven-central/org.cstamas.vertx.sisu/parent/badge.svg?subject=org.cstamas.vertx.sisu:parent)](https://maven-badges.herokuapp.com/maven-central/org.cstamas.vertx.sisu/parent)
 
 
 ## Bound Vertx components
