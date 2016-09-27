@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.cstamas</groupId>
     <artifactId>parent</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
   </parent>
 
   <groupId>org.cstamas.vertx.sisu</groupId>
@@ -31,7 +31,7 @@
   </issueManagement>
 
   <properties>
-    <vertx.version>3.2.1</vertx.version>
+    <vertx.version>3.3.3</vertx.version>
     <aether.version>1.0.2.v20150114</aether.version>
     <sisu.version>0.3.3</sisu.version>
   </properties>
@@ -151,14 +151,14 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.7.18</version>
+        <version>1.7.21</version>
       </dependency>
 
       <!-- Aether/Maven needs SLf4J at runtime -->
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
-        <version>1.7.18</version>
+        <version>1.7.21</version>
       </dependency>
 
       <dependency>
