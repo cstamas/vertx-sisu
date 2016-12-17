@@ -4,12 +4,12 @@
   <parent>
     <groupId>org.cstamas</groupId>
     <artifactId>parent</artifactId>
-    <version>1.0.1</version>
+    <version>2.0.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.cstamas.vertx.sisu</groupId>
   <artifactId>parent</artifactId>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>2.0.0-SNAPSHOT</version>
 
   <packaging>pom</packaging>
 
@@ -32,7 +32,7 @@
 
   <properties>
     <vertx.version>3.3.3</vertx.version>
-    <aether.version>1.0.2.v20150114</aether.version>
+    <aether.version>1.1.0</aether.version>
     <sisu.version>0.3.3</sisu.version>
   </properties>
 
@@ -151,14 +151,14 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.7.21</version>
+        <version>1.7.22</version>
       </dependency>
 
       <!-- Aether/Maven needs SLf4J at runtime -->
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
-        <version>1.7.21</version>
+        <version>1.7.22</version>
       </dependency>
 
       <dependency>
@@ -176,5 +176,17 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.eclipse.sisu</groupId>
+          <artifactId>sisu-maven-plugin</artifactId>
+          <version>${sisu.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
 </project>
